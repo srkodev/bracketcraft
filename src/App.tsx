@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import Tournaments from "./pages/Tournaments";
 import Teams from "./pages/Teams";
 import TeamDetail from "./pages/TeamDetail";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/tournaments" element={<Tournaments />} />
             <Route path="/tournaments/create" element={<CreateTournament />} />
             <Route path="/tournaments/:id/bracket" element={<TournamentBracket />} />
