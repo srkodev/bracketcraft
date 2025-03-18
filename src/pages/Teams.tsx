@@ -1,23 +1,32 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Search, UserPlus, Crown, Share2, Trophy } from 'lucide-react';
+import { Users, Search, UserPlus, Crown, Share2, Trophy, AlertCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import Layout from '@/components/Layout';
 
-// Données d'équipes fictives
-const TEAMS = [
+// Données de tournois fictifs (référence)
+const TOURNAMENTS = [
+  { id: 1, name: "Coupe de France E-Sport 2023" },
+  { id: 2, name: "League of Legends Championship" },
+  { id: 3, name: "Tournoi de Tennis Municipal" },
+  { id: 4, name: "Coupe Inter-Entreprises de Football" },
+];
+
+// Données d'équipes fictives liées aux tournois
+const TEAMS_DATA = [
   {
     id: 1,
     name: "Les Invincibles",
     leader: "Martin Dupont",
     leaderAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
     members: 6,
-    tournaments: 12,
     wins: 5,
+    tournamentId: 1,
     logo: "https://source.unsplash.com/random/100x100/?logo"
   },
   {
@@ -26,8 +35,8 @@ const TEAMS = [
     leader: "Sophie Martin",
     leaderAvatar: "https://randomuser.me/api/portraits/women/1.jpg",
     members: 4,
-    tournaments: 8,
     wins: 3,
+    tournamentId: 1,
     logo: "https://source.unsplash.com/random/100x100/?phoenix"
   },
   {
@@ -36,8 +45,8 @@ const TEAMS = [
     leader: "Antoine Bernard",
     leaderAvatar: "https://randomuser.me/api/portraits/men/2.jpg",
     members: 5,
-    tournaments: 9,
     wins: 2,
+    tournamentId: 2,
     logo: "https://source.unsplash.com/random/100x100/?strategy"
   },
   {
@@ -46,8 +55,8 @@ const TEAMS = [
     leader: "Julie Renard",
     leaderAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
     members: 6,
-    tournaments: 15,
     wins: 7,
+    tournamentId: 2,
     logo: "https://source.unsplash.com/random/100x100/?alpha"
   },
   {
@@ -56,8 +65,8 @@ const TEAMS = [
     leader: "Pierre Leclerc",
     leaderAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
     members: 5,
-    tournaments: 11,
     wins: 4,
+    tournamentId: 3,
     logo: "https://source.unsplash.com/random/100x100/?champion"
   },
   {
@@ -66,24 +75,58 @@ const TEAMS = [
     leader: "Marie Dubois",
     leaderAvatar: "https://randomuser.me/api/portraits/women/3.jpg",
     members: 4,
-    tournaments: 7,
     wins: 2,
+    tournamentId: 4,
     logo: "https://source.unsplash.com/random/100x100/?omega"
   }
 ];
 
+// Type pour une équipe
+interface Team {
+  id: number;
+  name: string;
+  leader: string;
+  leaderAvatar: string;
+  members: number;
+  wins: number;
+  tournamentId: number;
+  logo: string;
+}
+
 const Teams = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tournamentId = searchParams.get('tournamentId') ? Number(searchParams.get('tournamentId')) : null;
   const [searchTerm, setSearchTerm] = useState('');
-  const [teams, setTeams] = useState(TEAMS);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [currentTournament, setCurrentTournament] = useState<{id: number, name: string} | null>(null);
+
+  useEffect(() => {
+    // Filtrer les équipes par tournoi et terme de recherche
+    let filteredTeams = TEAMS_DATA;
+    
+    if (tournamentId) {
+      filteredTeams = filteredTeams.filter(team => team.tournamentId === tournamentId);
+      const tournament = TOURNAMENTS.find(t => t.id === tournamentId);
+      if (tournament) {
+        setCurrentTournament(tournament);
+      }
+    } else {
+      setCurrentTournament(null);
+    }
+    
+    if (searchTerm) {
+      filteredTeams = filteredTeams.filter(team => 
+        team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        team.leader.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    setTeams(filteredTeams);
+  }, [tournamentId, searchTerm]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Filtrer les équipes en fonction du terme de recherche
-    const filtered = TEAMS.filter(team => 
-      team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      team.leader.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setTeams(filtered);
+    // Le filtrage est déjà géré par useEffect
   };
 
   return (
@@ -91,20 +134,40 @@ const Teams = () => {
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Équipes</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {currentTournament ? `Équipes - ${currentTournament.name}` : 'Toutes les équipes'}
+            </h1>
             <p className="mt-2 text-gray-600">
-              Découvrez des équipes, rejoignez-les ou créez la vôtre.
+              {currentTournament 
+                ? `Découvrez les équipes participant à ce tournoi` 
+                : `Découvrez les équipes participant aux différents tournois.`}
             </p>
           </div>
-          <div className="mt-4 md:mt-0">
-            <Link to="/teams/create">
-              <Button className="bg-tournament-blue hover:bg-blue-600">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Créer une équipe
-              </Button>
-            </Link>
-          </div>
+          {currentTournament && (
+            <div className="mt-4 md:mt-0">
+              <Link to={`/teams/create?tournamentId=${currentTournament.id}`}>
+                <Button className="bg-tournament-blue hover:bg-blue-600">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Inscrire une équipe
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
+
+        {!currentTournament && (
+          <Alert className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Veuillez sélectionner un tournoi pour voir les équipes participantes.
+              <div className="mt-2">
+                <Link to="/tournaments" className="text-tournament-blue hover:underline">
+                  Aller à la page des tournois
+                </Link>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
           <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
@@ -126,7 +189,7 @@ const Teams = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {teams.map((team) => (
-            <Link to={`/teams/${team.id}`} key={team.id}>
+            <Link to={`/teams/${team.id}?tournamentId=${team.tournamentId}`} key={team.id}>
               <Card className="h-full hover:shadow-md transition-shadow duration-300">
                 <CardHeader className="flex flex-row items-center gap-4">
                   <Avatar className="h-14 w-14 border-2 border-gray-200">
@@ -182,8 +245,14 @@ const Teams = () => {
         {teams.length === 0 && (
           <div className="text-center py-12">
             <Users className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-lg font-medium text-gray-900">Aucune équipe trouvée</h3>
-            <p className="mt-1 text-gray-500">Essayez de modifier vos critères de recherche.</p>
+            <h3 className="mt-2 text-lg font-medium text-gray-900">
+              {currentTournament ? "Aucune équipe inscrite à ce tournoi" : "Aucune équipe trouvée"}
+            </h3>
+            <p className="mt-1 text-gray-500">
+              {currentTournament 
+                ? "Soyez le premier à inscrire votre équipe !" 
+                : "Essayez de modifier vos critères de recherche ou sélectionnez un tournoi."}
+            </p>
           </div>
         )}
       </div>

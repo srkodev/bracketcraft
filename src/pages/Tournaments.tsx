@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -22,7 +23,8 @@ interface Tournament {
   status: TournamentStatus;
   imageSrc: string;
 }
-const TOURNAMENTS = [{
+
+const TOURNAMENTS: Tournament[] = [{
   id: 1,
   title: "Coupe de France E-Sport 2023",
   organizer: "eSport Federation",
@@ -77,11 +79,13 @@ const TOURNAMENTS = [{
   status: "Terminé",
   imageSrc: "https://source.unsplash.com/random/300x200/?chess"
 }];
+
 const Tournaments = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<TournamentStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<TournamentType | 'all'>('all');
   const [tournaments, setTournaments] = useState<Tournament[]>(TOURNAMENTS);
+
   const handleFilters = () => {
     let filtered = TOURNAMENTS.filter(tournament => {
       const matchesSearch = tournament.title.toLowerCase().includes(searchTerm.toLowerCase()) || tournament.organizer.toLowerCase().includes(searchTerm.toLowerCase());
@@ -91,10 +95,13 @@ const Tournaments = () => {
     });
     setTournaments(filtered);
   };
+  
   React.useEffect(() => {
     handleFilters();
   }, [searchTerm, statusFilter, typeFilter]);
-  return <Layout>
+  
+  return (
+    <Layout>
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -150,58 +157,71 @@ const Tournaments = () => {
 
         {/* Tournament Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tournaments.map(tournament => <Link to={`/tournaments/${tournament.id}`} key={tournament.id}>
-              <Card className="h-full hover:shadow-lg transition-all duration-300 overflow-hidden group">
-                <div className="h-48 overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-                  <img src={tournament.imageSrc} alt={tournament.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" />
-                  <div className={`
-                    absolute top-4 right-4 z-20 px-3 py-1 text-sm font-medium rounded-full
-                    ${tournament.status === 'En cours' ? 'bg-green-500 text-white' : tournament.status === 'À venir' ? 'bg-blue-500 text-white' : 'bg-gray-500 text-white'}
-                  `}>
-                    {tournament.status}
+          {tournaments.map(tournament => (
+            <Card key={tournament.id} className="h-full hover:shadow-lg transition-all duration-300 overflow-hidden group">
+              <div className="h-48 overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
+                <img src={tournament.imageSrc} alt={tournament.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" />
+                <div className={`
+                  absolute top-4 right-4 z-20 px-3 py-1 text-sm font-medium rounded-full
+                  ${tournament.status === 'En cours' ? 'bg-green-500 text-white' : tournament.status === 'À venir' ? 'bg-blue-500 text-white' : 'bg-gray-500 text-white'}
+                `}>
+                  {tournament.status}
+                </div>
+              </div>
+              <CardHeader className="relative z-20 -mt-6 my-[2px]">
+                <div className="bg-white rounded-lg p-4">
+                  <CardTitle className="text-xl mb-2">{tournament.title}</CardTitle>
+                  <p className="text-sm text-gray-500">{tournament.organizer}</p>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Calendar className="mr-2 h-4 w-4 text-tournament-blue" />
+                    <span>{tournament.date}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Users className="mr-2 h-4 w-4 text-tournament-blue" />
+                    <span>{tournament.teams} équipes</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Trophy className="mr-2 h-4 w-4 text-tournament-blue" />
+                    <span>{tournament.type}</span>
                   </div>
                 </div>
-                <CardHeader className="relative z-20 -mt-6 my-[2px]">
-                  <div className="bg-white rounded-lg p-4">
-                    <CardTitle className="text-xl mb-2">{tournament.title}</CardTitle>
-                    <p className="text-sm text-gray-500">{tournament.organizer}</p>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <div className="space-y-3">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Calendar className="mr-2 h-4 w-4 text-tournament-blue" />
-                      <span>{tournament.date}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Users className="mr-2 h-4 w-4 text-tournament-blue" />
-                      <span>{tournament.teams} équipes</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Trophy className="mr-2 h-4 w-4 text-tournament-blue" />
-                      <span>{tournament.type}</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="ghost" className="w-full text-tournament-blue hover:bg-blue-50 group-hover:bg-blue-50">
-                    Voir les détails
-                    <svg className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Button>
-                </CardFooter>
-              </Card>
-            </Link>)}
+              </CardContent>
+              <CardFooter>
+                <div className="w-full flex justify-between">
+                  <Link to={`/tournaments/${tournament.id}`} className="flex-1">
+                    <Button variant="ghost" className="w-full text-tournament-blue hover:bg-blue-50 group-hover:bg-blue-50">
+                      Voir le tournoi
+                      <svg className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Button>
+                  </Link>
+                  <Link to={`/teams?tournamentId=${tournament.id}`}>
+                    <Button variant="outline" className="ml-2 text-tournament-blue hover:bg-blue-50">
+                      <Users className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
 
-        {tournaments.length === 0 && <div className="text-center py-12">
+        {tournaments.length === 0 && (
+          <div className="text-center py-12">
             <Trophy className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-lg font-medium text-gray-900">Aucun tournoi trouvé</h3>
             <p className="mt-1 text-gray-500">Essayez de modifier vos critères de recherche.</p>
-          </div>}
+          </div>
+        )}
       </div>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default Tournaments;
