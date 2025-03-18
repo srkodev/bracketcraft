@@ -7,10 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Trophy, Crown, ArrowRight, Calendar, Clock, Users } from 'lucide-react';
 import Layout from '@/components/Layout';
+import { cn } from '@/lib/utils';
 
 const TournamentBracket = () => {
   const { id } = useParams<{ id: string }>();
-  const [currentRound, setCurrentRound] = useState('semifinals');
+  const [currentRound, setCurrentRound] = useState('quarterfinals');
 
   // Données simulées pour un tournoi
   const tournament = {
@@ -166,102 +167,119 @@ const TournamentBracket = () => {
   };
 
   // Rendu d'un match
-  const renderMatch = (match: any) => (
-    <Card key={match.id} className="match-card">
-      <CardContent className="p-4">
-        <div className="mb-2 flex justify-between items-center">
-          <div className="text-sm font-medium text-gray-500">{match.round}</div>
-          <div className="text-xs text-gray-400 flex items-center">
-            <Calendar className="h-3 w-3 mr-1" />
-            {match.date}
+  const renderMatch = (match: any, roundIndex: number) => (
+    <div key={match.id} className="relative">
+      <Card className="match-card mb-4 border-l-4 border-tournament-blue">
+        <CardContent className="p-4">
+          <div className="mb-2 flex justify-between items-center">
+            <div className="text-sm font-medium text-gray-500">{match.round}</div>
+            <div className="text-xs text-gray-400 flex items-center">
+              <Calendar className="h-3 w-3 mr-1" />
+              {match.date}
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          {/* Équipe 1 */}
-          <div className={`flex items-center justify-between p-2 rounded ${
-            match.team1.isWinner ? 'bg-green-50' : 'bg-gray-50'
-          }`}>
-            <div className="flex items-center">
-              <Avatar className="h-8 w-8 mr-2">
-                <AvatarImage src={match.team1.logo} />
-                <AvatarFallback>{match.team1.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <span className={`text-sm font-medium ${match.team1.isWinner ? 'font-bold' : ''}`}>
-                {match.team1.name}
+          <div className="space-y-2">
+            {/* Équipe 1 */}
+            <div className={`flex items-center justify-between p-2 rounded ${
+              match.team1.isWinner ? 'bg-green-50 border-l-2 border-tournament-gold' : 'bg-gray-50'
+            }`}>
+              <div className="flex items-center">
+                <Avatar className="h-8 w-8 mr-2">
+                  <AvatarImage src={match.team1.logo} />
+                  <AvatarFallback>{match.team1.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <span className={`text-sm font-medium ${match.team1.isWinner ? 'font-bold' : ''}`}>
+                  {match.team1.name}
+                </span>
+              </div>
+              <span className={`team-score ${match.team1.isWinner ? 'winner' : ''}`}>
+                {match.team1.score}
               </span>
             </div>
-            <span className={`team-score ${match.team1.isWinner ? 'winner' : ''}`}>
-              {match.team1.score}
-            </span>
-          </div>
 
-          {/* Équipe 2 */}
-          <div className={`flex items-center justify-between p-2 rounded ${
-            match.team2.isWinner ? 'bg-green-50' : 'bg-gray-50'
-          }`}>
-            <div className="flex items-center">
-              <Avatar className="h-8 w-8 mr-2">
-                <AvatarImage src={match.team2.logo} />
-                <AvatarFallback>{match.team2.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <span className={`text-sm font-medium ${match.team2.isWinner ? 'font-bold' : ''}`}>
-                {match.team2.name}
+            {/* Équipe 2 */}
+            <div className={`flex items-center justify-between p-2 rounded ${
+              match.team2.isWinner ? 'bg-green-50 border-l-2 border-tournament-gold' : 'bg-gray-50'
+            }`}>
+              <div className="flex items-center">
+                <Avatar className="h-8 w-8 mr-2">
+                  <AvatarImage src={match.team2.logo} />
+                  <AvatarFallback>{match.team2.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <span className={`text-sm font-medium ${match.team2.isWinner ? 'font-bold' : ''}`}>
+                  {match.team2.name}
+                </span>
+              </div>
+              <span className={`team-score ${match.team2.isWinner ? 'winner' : ''}`}>
+                {match.team2.score}
               </span>
             </div>
-            <span className={`team-score ${match.team2.isWinner ? 'winner' : ''}`}>
-              {match.team2.score}
-            </span>
           </div>
-        </div>
 
-        {match.status === 'scheduled' && (
-          <div className="mt-4 text-xs text-center text-gray-500 flex items-center justify-center">
-            <Clock className="h-3 w-3 mr-1" />
-            {match.time}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          {match.status === 'scheduled' && (
+            <div className="mt-4 text-xs text-center text-gray-500 flex items-center justify-center">
+              <Clock className="h-3 w-3 mr-1" />
+              {match.time}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      {/* Connecteur pour les matchs (sauf pour la finale) */}
+      {roundIndex < 2 && match.team1.isWinner && (
+        <div className="connector-right hidden lg:block"></div>
+      )}
+      {roundIndex < 2 && match.team2.isWinner && (
+        <div className="connector-right hidden lg:block"></div>
+      )}
+    </div>
   );
 
-  // Rendu de l'arbre du tournoi pour les différentes phases
-  const renderBracket = () => {
-    switch(currentRound) {
-      case 'finals':
-        return (
-          <div className="flex justify-center py-8">
-            {matches.finals.map(renderMatch)}
+  // Horizontal bracket render
+  const renderHorizontalBracket = () => {
+    const rounds = [];
+    
+    // Add quarterfinals if showing all rounds
+    if (currentRound === 'quarterfinals') {
+      rounds.push(
+        <div key="quarterfinals" className="round-column">
+          <h3 className="text-center text-sm font-bold mb-4 text-gray-700 uppercase tracking-wider">Quarts de finale</h3>
+          <div className="space-y-8">
+            {matches.quarterfinals.map((match, index) => renderMatch(match, 0))}
           </div>
-        );
-      case 'semifinals':
-        return (
-          <div className="flex flex-col items-center">
-            <div className="flex justify-center py-8">
-              {matches.finals.map(renderMatch)}
-            </div>
-            <div className="flex justify-center gap-12 py-8">
-              {matches.semifinals.map(renderMatch)}
-            </div>
-          </div>
-        );
-      case 'quarterfinals':
-        return (
-          <div className="flex flex-col items-center">
-            <div className="flex justify-center py-8">
-              {matches.finals.map(renderMatch)}
-            </div>
-            <div className="flex justify-center gap-12 py-8">
-              {matches.semifinals.map(renderMatch)}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12 py-8">
-              {matches.quarterfinals.map(renderMatch)}
-            </div>
-          </div>
-        );
-      default:
-        return null;
+        </div>
+      );
     }
+    
+    // Add semifinals
+    if (currentRound === 'quarterfinals' || currentRound === 'semifinals') {
+      rounds.push(
+        <div key="semifinals" className="round-column">
+          <h3 className="text-center text-sm font-bold mb-4 text-gray-700 uppercase tracking-wider">Demi-finales</h3>
+          <div className="space-y-12 md:space-y-24 lg:space-y-32">
+            {matches.semifinals.map((match, index) => renderMatch(match, 1))}
+          </div>
+        </div>
+      );
+    }
+    
+    // Always add finals
+    rounds.push(
+      <div key="finals" className="round-column">
+        <h3 className="text-center text-sm font-bold mb-4 text-gray-700 uppercase tracking-wider">Finale</h3>
+        <div className="space-y-12 md:space-y-24 lg:space-y-48 flex items-center justify-center h-full pt-16 lg:pt-32">
+          {matches.finals.map((match, index) => renderMatch(match, 2))}
+        </div>
+      </div>
+    );
+    
+    return (
+      <div className="horizontal-bracket px-4 py-6 overflow-x-auto">
+        <div className="flex space-x-6 md:space-x-12 lg:space-x-24 min-w-[800px]">
+          {rounds}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -318,32 +336,28 @@ const TournamentBracket = () => {
                 <Button 
                   variant={currentRound === 'quarterfinals' ? 'default' : 'outline'} 
                   onClick={() => setCurrentRound('quarterfinals')}
-                  className={currentRound === 'quarterfinals' ? 'bg-tournament-blue' : ''}
+                  className={cn(currentRound === 'quarterfinals' ? 'bg-tournament-blue' : '')}
                 >
-                  Quarts de finale
+                  Vue complète
                 </Button>
                 <Button 
                   variant={currentRound === 'semifinals' ? 'default' : 'outline'}
                   onClick={() => setCurrentRound('semifinals')}
-                  className={currentRound === 'semifinals' ? 'bg-tournament-blue' : ''}
+                  className={cn(currentRound === 'semifinals' ? 'bg-tournament-blue' : '')}
                 >
-                  Demi-finales
+                  Demi-finales et Finale
                 </Button>
                 <Button 
                   variant={currentRound === 'finals' ? 'default' : 'outline'}
                   onClick={() => setCurrentRound('finals')}
-                  className={currentRound === 'finals' ? 'bg-tournament-blue' : ''}
+                  className={cn(currentRound === 'finals' ? 'bg-tournament-blue' : '')}
                 >
                   Finale
                 </Button>
               </div>
             </div>
 
-            <div className="overflow-x-auto pb-8">
-              <div className="min-w-[800px] md:min-w-0">
-                {renderBracket()}
-              </div>
-            </div>
+            {renderHorizontalBracket()}
           </TabsContent>
 
           <TabsContent value="teams">
