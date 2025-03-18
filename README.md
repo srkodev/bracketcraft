@@ -1,69 +1,71 @@
-# Welcome to your Lovable project
 
-## Project info
+# BracketCraft - Plateforme de Gestion de Tournois
 
-**URL**: https://lovable.dev/projects/5d32c490-8006-41dd-8c9f-0372c6da4823
+BracketCraft est une plateforme web moderne dédiée à l'organisation et la gestion de tournois en ligne. Que vous soyez un organisateur expérimenté ou que vous souhaitiez créer votre premier tournoi, BracketCraft vous offre tous les outils nécessaires.
 
-## How can I edit this code?
+## Fonctionnalités principales
 
-There are several ways of editing your application.
+- **Création de tournois personnalisés**
+  - Différents formats de tournois (simple élimination, double élimination)
+  - Personnalisation des règles et paramètres
+  - Gestion des inscriptions d'équipes
 
-**Use Lovable**
+- **Gestion d'équipes**
+  - Création et gestion d'équipes
+  - Invitations de membres
+  - Suivi des performances
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5d32c490-8006-41dd-8c9f-0372c6da4823) and start prompting.
+- **Suivi des matchs**
+  - Tableau des matchs en temps réel
+  - Validation des résultats
+  - Historique des rencontres
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Interface administrative**
+  - Tableau de bord intuitif
+  - Gestion des droits d'accès
+  - Outils de modération
 
-**Use your preferred IDE**
+## Technologies utilisées
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Le projet est construit avec des technologies modernes :
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Vite
+- React Query
 
-Follow these steps:
+## Comment démarrer ?
 
+1. **Installation des dépendances**
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+npm install
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+2. **Lancement en développement**
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+3. **Construction pour la production**
+```sh
+npm run build
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Structure du projet
 
-**Use GitHub Codespaces**
+- `/src/components` - Composants réutilisables
+- `/src/pages` - Pages de l'application
+- `/src/context` - Contextes React
+- `/src/hooks` - Hooks personnalisés
+- `/src/lib` - Utilitaires et fonctions helpers
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Contribution
 
-## What technologies are used for this project?
+Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
 
-This project is built with .
+## Licence
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+BracketCraft est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/5d32c490-8006-41dd-8c9f-0372c6da4823) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
