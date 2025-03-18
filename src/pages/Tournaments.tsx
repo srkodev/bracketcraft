@@ -162,7 +162,7 @@ const Tournaments = () => {
                     {tournament.status}
                   </div>
                 </div>
-                <CardHeader className="relative z-20 -mt-6">
+                <CardHeader className="relative z-20 -mt-6 my-[2px]">
                   <div className="bg-white rounded-lg p-4">
                     <CardTitle className="text-xl mb-2">{tournament.title}</CardTitle>
                     <p className="text-sm text-gray-500">{tournament.organizer}</p>
