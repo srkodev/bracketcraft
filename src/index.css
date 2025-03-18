@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -135,13 +136,14 @@
     @apply flex-1 flex flex-col;
   }
   
-  .connector-right {
-    @apply absolute top-1/2 right-0 h-0.5 bg-tournament-blue w-6 md:w-12 lg:w-24;
-    transform: translateX(100%);
+  /* Removed connector classes */
+  
+  /* New classes for proper vertical alignment */
+  .semi-finals-container {
+    @apply flex flex-col justify-evenly h-full space-y-24 md:space-y-48 lg:space-y-64 py-16;
   }
   
-  .connector-left {
-    @apply absolute top-1/2 left-0 h-0.5 bg-tournament-blue w-6 md:w-12 lg:w-24;
-    transform: translateX(-100%);
+  .final-container {
+    @apply flex flex-col justify-center h-full py-32 md:py-48 lg:py-64;
   }
 }

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -167,9 +166,9 @@ const TournamentBracket = () => {
   };
 
   // Rendu d'un match
-  const renderMatch = (match: any, roundIndex: number) => (
-    <div key={match.id} className="relative">
-      <Card className="match-card mb-4 border-l-4 border-tournament-blue">
+  const renderMatch = (match: any) => (
+    <div key={match.id} className="relative mb-4">
+      <Card className="match-card border-l-4 border-tournament-blue">
         <CardContent className="p-4">
           <div className="mb-2 flex justify-between items-center">
             <div className="text-sm font-medium text-gray-500">{match.round}</div>
@@ -225,17 +224,10 @@ const TournamentBracket = () => {
           )}
         </CardContent>
       </Card>
-      {/* Connecteur pour les matchs (sauf pour la finale) */}
-      {roundIndex < 2 && match.team1.isWinner && (
-        <div className="connector-right hidden lg:block"></div>
-      )}
-      {roundIndex < 2 && match.team2.isWinner && (
-        <div className="connector-right hidden lg:block"></div>
-      )}
     </div>
   );
 
-  // Horizontal bracket render
+  // Horizontal bracket render with improved alignment
   const renderHorizontalBracket = () => {
     const rounds = [];
     
@@ -245,30 +237,34 @@ const TournamentBracket = () => {
         <div key="quarterfinals" className="round-column">
           <h3 className="text-center text-sm font-bold mb-4 text-gray-700 uppercase tracking-wider">Quarts de finale</h3>
           <div className="space-y-8">
-            {matches.quarterfinals.map((match, index) => renderMatch(match, 0))}
+            {matches.quarterfinals.map((match) => renderMatch(match))}
           </div>
         </div>
       );
     }
     
-    // Add semifinals
+    // Add semifinals with centered alignment
     if (currentRound === 'quarterfinals' || currentRound === 'semifinals') {
       rounds.push(
         <div key="semifinals" className="round-column">
           <h3 className="text-center text-sm font-bold mb-4 text-gray-700 uppercase tracking-wider">Demi-finales</h3>
-          <div className="space-y-12 md:space-y-24 lg:space-y-32">
-            {matches.semifinals.map((match, index) => renderMatch(match, 1))}
+          <div className="flex flex-col justify-center h-full">
+            <div className="semi-finals-container">
+              {matches.semifinals.map((match) => renderMatch(match))}
+            </div>
           </div>
         </div>
       );
     }
     
-    // Always add finals
+    // Always add finals centered
     rounds.push(
       <div key="finals" className="round-column">
         <h3 className="text-center text-sm font-bold mb-4 text-gray-700 uppercase tracking-wider">Finale</h3>
-        <div className="space-y-12 md:space-y-24 lg:space-y-48 flex items-center justify-center h-full pt-16 lg:pt-32">
-          {matches.finals.map((match, index) => renderMatch(match, 2))}
+        <div className="flex flex-col justify-center items-center h-full">
+          <div className="final-container">
+            {matches.finals.map((match) => renderMatch(match))}
+          </div>
         </div>
       </div>
     );
