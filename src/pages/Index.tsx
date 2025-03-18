@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Trophy, Users, Calendar, Shield, ArrowRight } from 'lucide-react';
 import Layout from '@/components/Layout';
+
 const Index = () => {
   return <Layout>
       {/* Hero Section */}
@@ -91,7 +92,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-8 grid-cols-1 md:grid-cols-3">
             <div className="bg-white rounded-lg shadow-sm p-6 card-highlight">
               <div className="h-12 w-12 bg-blue-100 rounded-md flex items-center justify-center text-tournament-blue">
                 <Trophy className="h-6 w-6" />
@@ -121,30 +122,6 @@ const Index = () => {
                 Organisez vos matchs avec un calendrier intuitif et des notifications.
               </p>
             </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6 card-highlight">
-              <div className="h-12 w-12 bg-blue-100 rounded-md flex items-center justify-center text-tournament-blue">
-                <Shield className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">Validation des résultats</h3>
-              <p className="mt-2 text-gray-500">
-                Système de validation des scores pour garantir l'équité des résultats.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6 card-highlight" style={{
-            gridColumn: "span 2 / span 2"
-          }}>
-              <div className="h-12 w-12 bg-blue-100 rounded-md flex items-center justify-center text-tournament-blue">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-              </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">Interface utilisateur intuitive</h3>
-              <p className="mt-2 text-gray-500">
-                Une plateforme moderne et réactive, accessible sur tous vos appareils pour une expérience utilisateur optimale.
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -170,4 +147,5 @@ const Index = () => {
       </section>
     </Layout>;
 };
+
 export default Index;
