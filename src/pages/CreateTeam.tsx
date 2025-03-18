@@ -10,6 +10,8 @@ import { AlertTriangle, Upload, Users, X, ArrowLeft } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Layout from '@/components/Layout';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 // Liste de tournois fictifs
 const TOURNAMENTS = [
@@ -23,6 +25,8 @@ const CreateTeam = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const tournamentId = searchParams.get('tournamentId') ? Number(searchParams.get('tournamentId')) : null;
+  const { user } = useAuth();
+  const { toast } = useToast();
   
   const [teamName, setTeamName] = useState('');
   const [teamDescription, setTeamDescription] = useState('');
@@ -30,6 +34,18 @@ const CreateTeam = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [currentTournament, setCurrentTournament] = useState<{id: number, name: string} | null>(null);
+
+  useEffect(() => {
+    // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+    if (!user && !isLoading) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez être connecté pour créer une équipe",
+        variant: "destructive"
+      });
+      navigate('/login');
+    }
+  }, [user, navigate, isLoading, toast]);
 
   useEffect(() => {
     if (tournamentId) {
@@ -76,16 +92,15 @@ const CreateTeam = () => {
     // Simulons l'inscription d'une équipe à un tournoi
     setTimeout(() => {
       setIsLoading(false);
-      console.log('Team created for tournament:', {
-        teamName,
-        teamDescription,
-        logoPreview,
-        tournamentId
+      toast({
+        title: "Équipe créée",
+        description: `L'équipe ${teamName} a été inscrite au tournoi avec succès`,
       });
       navigate(`/teams?tournamentId=${tournamentId}`);
     }, 1500);
   };
 
+  // Le reste du composant reste identique
   return (
     <Layout>
       <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">

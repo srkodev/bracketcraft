@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,35 +8,40 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Trophy, AlertCircle, Check } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Layout from '@/components/Layout';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const { register, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
 
     // Validation basique
     if (password !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas');
-      setIsLoading(false);
       return;
     }
     
-    // Simulons une inscription
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await register(username, email, password);
+      toast({
+        title: "Inscription réussie",
+        description: "Votre compte a été créé avec succès",
+      });
       setSuccess(true);
-      // Dans une véritable application, nous inscririons l'utilisateur ici
-      console.log('Register with:', { username, email, password });
-    }, 1500);
+    } catch (error) {
+      setError('Échec de l\'inscription. Veuillez réessayer.');
+    }
   };
 
   if (success) {

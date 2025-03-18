@@ -1,14 +1,37 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Trophy, Menu, X, Home, Calendar } from 'lucide-react';
+import { Trophy, Menu, X, Home, Calendar, UserCircle, LogOut, Shield } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from '@/components/ui/use-toast';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Déconnexion réussie",
+      description: "Vous avez été déconnecté avec succès",
+    });
+    navigate('/');
   };
 
   return (
@@ -30,24 +53,69 @@ const Navbar = () => {
               <Link to="/tournaments" className="text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-sm font-medium">
                 Tournois
               </Link>
-              <Link to="/dashboard" className="text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-sm font-medium">
-                Tableau de bord
-              </Link>
+              {user && (
+                <Link to="/dashboard" className="text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-sm font-medium">
+                  Tableau de bord
+                </Link>
+              )}
             </div>
           </div>
           
           <div className="hidden md:block">
             <div className="ml-4 flex items-center space-x-3">
-              <Link to="/login">
-                <Button variant="outline" className="border-tournament-blue text-tournament-blue hover:bg-tournament-blue hover:text-white">
-                  Connexion
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button className="bg-tournament-blue text-white hover:bg-blue-600">
-                  Inscription
-                </Button>
-              </Link>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="/placeholder.svg" alt={user.username} />
+                        <AvatarFallback>{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.username}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard" className="cursor-pointer">
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Tableau de bord</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="cursor-pointer">
+                        <UserCircle className="mr-2 h-4 w-4" />
+                        <span>Profil</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Déconnexion</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <Button variant="outline" className="border-tournament-blue text-tournament-blue hover:bg-tournament-blue hover:text-white">
+                      Connexion
+                    </Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button className="bg-tournament-blue text-white hover:bg-blue-600">
+                      Inscription
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
           
@@ -74,26 +142,54 @@ const Navbar = () => {
               <Trophy className="mr-2 h-5 w-5" />
               Tournois
             </Link>
-            <Link to="/dashboard" className="flex items-center text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-base font-medium">
-              <Calendar className="mr-2 h-5 w-5" />
-              Tableau de bord
-            </Link>
+            {user && (
+              <Link to="/dashboard" className="flex items-center text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-base font-medium">
+                <Calendar className="mr-2 h-5 w-5" />
+                Tableau de bord
+              </Link>
+            )}
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200">
-            <div className="flex items-center px-5 space-x-3">
-              <Link to="/login" className="w-full">
-                <Button variant="outline" className="w-full border-tournament-blue text-tournament-blue hover:bg-tournament-blue hover:text-white">
-                  Connexion
-                </Button>
-              </Link>
-            </div>
-            <div className="mt-3 px-5">
-              <Link to="/register" className="w-full">
-                <Button className="w-full bg-tournament-blue text-white hover:bg-blue-600">
-                  Inscription
-                </Button>
-              </Link>
-            </div>
+            {user ? (
+              <div className="px-5 space-y-3">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src="/placeholder.svg" alt={user.username} />
+                      <AvatarFallback>{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-base font-medium">{user.username}</div>
+                    <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                  </div>
+                </div>
+                <div className="mt-3 space-y-1">
+                  <Link to="/profile" className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+                    Profil
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full text-left block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+                  >
+                    Déconnexion
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 px-5">
+                <Link to="/login" className="w-full">
+                  <Button variant="outline" className="w-full border-tournament-blue text-tournament-blue hover:bg-tournament-blue hover:text-white">
+                    Connexion
+                  </Button>
+                </Link>
+                <Link to="/register" className="w-full">
+                  <Button className="w-full bg-tournament-blue text-white hover:bg-blue-600">
+                    Inscription
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
