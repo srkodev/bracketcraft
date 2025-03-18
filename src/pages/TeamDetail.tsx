@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -31,7 +30,6 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from '@/context/AuthContext';
 
-// Ajout de types pour les données
 interface TeamMember {
   id: number;
   name: string;
@@ -71,7 +69,6 @@ interface Team {
   logo: string;
 }
 
-// Données fictives pour le développement
 const TEAM_DATA: Record<string, Team> = {
   "1": {
     id: 1,
@@ -178,10 +175,11 @@ const TEAM_MATCHES: Record<string, Match[]> = {
 const TeamDetail = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const tournamentId = searchParams.get('tournamentId') ? Number(searchParams.get('tournamentId')) : null;
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
+  
+  const mockTeamId = "1";
   
   const [team, setTeam] = useState<Team | null>(null);
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -193,25 +191,17 @@ const TeamDetail = () => {
   const [memberToRemove, setMemberToRemove] = useState<TeamMember | null>(null);
 
   useEffect(() => {
-    if (!id || !tournamentId) {
-      navigate('/tournaments');
-      return;
-    }
-
-    // Charger les données de l'équipe
-    const teamData = TEAM_DATA[id];
+    const teamData = TEAM_DATA[mockTeamId];
+    
     if (teamData) {
       setTeam(teamData);
 
-      // Charger les membres de l'équipe
-      const teamMembers = TEAM_MEMBERS[id] || [];
+      const teamMembers = TEAM_MEMBERS[mockTeamId] || [];
       setMembers(teamMembers);
 
-      // Charger les matchs de l'équipe
-      const teamMatches = TEAM_MATCHES[id] || [];
+      const teamMatches = TEAM_MATCHES[mockTeamId] || [];
       setMatches(teamMatches);
 
-      // Initialiser les résultats des matchs en cours
       const initialResults: {[key: number]: {teamScore: number, opponentScore: number}} = {};
       teamMatches
         .filter(match => match.status === 'ongoing')
@@ -222,10 +212,8 @@ const TeamDetail = () => {
           };
         });
       setMatchResults(initialResults);
-    } else {
-      navigate('/tournaments');
     }
-  }, [id, tournamentId, navigate]);
+  }, []);
 
   const handleInviteMember = () => {
     if (!inviteEmail) {
@@ -237,7 +225,6 @@ const TeamDetail = () => {
       return;
     }
 
-    // Simuler l'envoi d'une invitation
     toast({
       title: "Invitation envoyée",
       description: `Une invitation a été envoyée à ${inviteEmail}`,
@@ -253,7 +240,6 @@ const TeamDetail = () => {
   const confirmRemoveMember = () => {
     if (!memberToRemove) return;
 
-    // Simuler la suppression d'un membre
     const updatedMembers = members.filter(m => m.id !== memberToRemove.id);
     setMembers(updatedMembers);
     
@@ -279,11 +265,9 @@ const TeamDetail = () => {
   const submitMatchResult = (matchId: number) => {
     setIsSubmitting(true);
     
-    // Simuler la soumission du résultat
     setTimeout(() => {
       const result = matchResults[matchId];
       
-      // Mettre à jour le match avec le résultat
       const updatedMatches = matches.map(match => {
         if (match.id === matchId) {
           return {
@@ -310,24 +294,26 @@ const TeamDetail = () => {
   };
 
   if (!team) {
-    return null; // Redirection gérée dans useEffect
+    return (
+      <Layout>
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-2xl font-bold">Chargement des données d'équipe...</h1>
+        </div>
+      </Layout>
+    );
   }
 
-  // Filtrer les matchs par statut
   const upcomingMatches = matches.filter(match => match.status === 'upcoming');
   const ongoingMatches = matches.filter(match => match.status === 'ongoing');
   const completedMatches = matches.filter(match => match.status === 'completed');
 
-  // Trier les matchs à venir par date
   upcomingMatches.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  // Déterminer si l'utilisateur connecté est le leader
   const isLeader = user && user.username === team.leader;
 
   return (
     <Layout>
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* En-tête de la page */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16 border-2 border-gray-200">
@@ -352,7 +338,6 @@ const TeamDetail = () => {
           </div>
         </div>
 
-        {/* Onglets */}
         <Tabs defaultValue="members" className="w-full">
           <TabsList className="grid grid-cols-4 mb-8">
             <TabsTrigger value="members" className="flex items-center gap-2">
@@ -373,7 +358,6 @@ const TeamDetail = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Contenu de l'onglet Membres */}
           <TabsContent value="members">
             <Card>
               <CardHeader>
@@ -383,7 +367,6 @@ const TeamDetail = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Formulaire d'invitation */}
                 <div className="mb-8">
                   <h3 className="text-lg font-medium mb-4">Inviter un nouveau membre</h3>
                   <div className="flex gap-2">
@@ -401,7 +384,6 @@ const TeamDetail = () => {
                   </div>
                 </div>
 
-                {/* Liste des membres */}
                 <div>
                   <h3 className="text-lg font-medium mb-4">Membres de l'équipe ({members.length})</h3>
                   <div className="space-y-4">
@@ -444,7 +426,6 @@ const TeamDetail = () => {
             </Card>
           </TabsContent>
 
-          {/* Contenu de l'onglet Match en cours */}
           <TabsContent value="currentMatch">
             <Card>
               <CardHeader>
@@ -551,7 +532,6 @@ const TeamDetail = () => {
             </Card>
           </TabsContent>
 
-          {/* Contenu de l'onglet Calendrier */}
           <TabsContent value="schedule">
             <Card>
               <CardHeader>
@@ -637,7 +617,6 @@ const TeamDetail = () => {
             </Card>
           </TabsContent>
 
-          {/* Contenu de l'onglet Résultats */}
           <TabsContent value="results">
             <Card>
               <CardHeader>
@@ -725,7 +704,6 @@ const TeamDetail = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Modal de confirmation pour supprimer un membre */}
         <Dialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
           <DialogContent>
             <DialogHeader>
