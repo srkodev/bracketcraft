@@ -1,13 +1,10 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Trophy, Users, Calendar, Shield, ArrowRight } from 'lucide-react';
 import Layout from '@/components/Layout';
-
 const Index = () => {
-  return (
-    <Layout>
+  return <Layout>
       {/* Hero Section */}
       <section className="hero-gradient">
         <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:py-24 lg:px-8">
@@ -30,7 +27,7 @@ const Index = () => {
                 </div>
                 <div className="mt-3 sm:mt-0 sm:ml-3">
                   <Link to="/tournaments">
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-lg border-white text-white hover:bg-white hover:text-tournament-blue">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-lg border-white hover:bg-white text-tournament-blue">
                       Explorer les tournois
                     </Button>
                   </Link>
@@ -135,7 +132,9 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm p-6 card-highlight" style={{ gridColumn: "span 2 / span 2" }}>
+            <div className="bg-white rounded-lg shadow-sm p-6 card-highlight" style={{
+            gridColumn: "span 2 / span 2"
+          }}>
               <div className="h-12 w-12 bg-blue-100 rounded-md flex items-center justify-center text-tournament-blue">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -169,8 +168,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Index;
