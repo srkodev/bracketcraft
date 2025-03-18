@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, User, Calendar, MapPin, Users, Clock, Shield, Info, MessageSquare, Share2, Settings, FileText } from 'lucide-react';
+import { Trophy, User, Calendar, MapPin, Users, Clock, Shield, Info, MessageSquare, Share2, Settings, FileText, Gift } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
