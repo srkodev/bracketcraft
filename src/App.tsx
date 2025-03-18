@@ -10,12 +10,15 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import Tournaments from "./pages/Tournaments";
+import TournamentDetail from "./pages/TournamentDetail";
+import TournamentManagement from "./pages/TournamentManagement";
 import Teams from "./pages/Teams";
 import TeamDetail from "./pages/TeamDetail";
 import Dashboard from "./pages/Dashboard";
 import TournamentBracket from "./pages/TournamentBracket";
 import CreateTournament from "./pages/CreateTournament";
 import CreateTeam from "./pages/CreateTeam";
+import Profile from "./pages/Profile";
 import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
@@ -34,12 +37,14 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/tournaments" element={<Tournaments />} />
             <Route path="/tournaments/create" element={<CreateTournament />} />
+            <Route path="/tournaments/:id" element={<TournamentDetail />} />
+            <Route path="/tournaments/:id/manage" element={<TournamentManagement />} />
             <Route path="/tournaments/:id/bracket" element={<TournamentBracket />} />
-            {/* Teams routes are still available but only accessible through tournament links */}
             <Route path="/teams" element={<Teams />} />
             <Route path="/teams/create" element={<CreateTeam />} />
             <Route path="/teams/:id" element={<TeamDetail />} />
             <Route path="/teams/:id/manage" element={<TeamDetail />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
