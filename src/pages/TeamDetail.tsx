@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,16 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from '@/context/AuthContext';
 
 interface TeamMember {
@@ -187,7 +198,7 @@ const TeamDetail = () => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [matchResults, setMatchResults] = useState<{[key: number]: {teamScore: number, opponentScore: number}}>({}); 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
+  const [removeMemberDialogOpen, setRemoveMemberDialogOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<TeamMember | null>(null);
 
   useEffect(() => {
@@ -234,7 +245,7 @@ const TeamDetail = () => {
 
   const handleRemoveMember = (member: TeamMember) => {
     setMemberToRemove(member);
-    setRemoveDialogOpen(true);
+    setRemoveMemberDialogOpen(true);
   };
 
   const confirmRemoveMember = () => {
@@ -248,7 +259,7 @@ const TeamDetail = () => {
       description: `${memberToRemove.name} a été retiré de l'équipe`,
     });
     
-    setRemoveDialogOpen(false);
+    setRemoveMemberDialogOpen(false);
     setMemberToRemove(null);
   };
 
@@ -415,7 +426,7 @@ const TeamDetail = () => {
                             onClick={() => handleRemoveMember(member)}
                             className="text-red-500 hover:text-red-600 hover:bg-red-50"
                           >
-                            <Trash className="h-4 w-4" />
+                            <UserMinus className="h-4 w-4" />
                           </Button>
                         )}
                       </div>
@@ -704,28 +715,28 @@ const TeamDetail = () => {
           </TabsContent>
         </Tabs>
 
-        <Dialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirmer la suppression</DialogTitle>
-              <DialogDescription>
+        <AlertDialog open={removeMemberDialogOpen} onOpenChange={setRemoveMemberDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+              <AlertDialogDescription>
                 Êtes-vous sûr de vouloir retirer {memberToRemove?.name} de l'équipe ? Cette action ne peut pas être annulée.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setRemoveDialogOpen(false)}>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setRemoveMemberDialogOpen(false)}>
                 Annuler
-              </Button>
-              <Button 
-                variant="destructive" 
+              </AlertDialogCancel>
+              <AlertDialogAction 
                 onClick={confirmRemoveMember}
+                className="bg-red-500 hover:bg-red-600"
               >
-                <Trash className="mr-2 h-4 w-4" />
+                <UserMinus className="mr-2 h-4 w-4" />
                 Supprimer
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Layout>
   );
