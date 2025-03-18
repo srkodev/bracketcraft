@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -192,7 +193,7 @@ const Teams = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {teams.map((team) => (
-            <Link to={`/teams/${team.id}?tournamentId=${team.tournamentId}`} key={team.id}>
+            <Link to={`/teams/${team.id}/manage?tournamentId=${team.tournamentId}`} key={team.id}>
               <Card className="h-full hover:shadow-md transition-shadow duration-300">
                 <CardHeader className="flex flex-row items-center gap-4">
                   <Avatar className="h-14 w-14 border-2 border-gray-200">

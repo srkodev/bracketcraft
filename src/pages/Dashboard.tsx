@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -378,7 +379,7 @@ const Dashboard = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Link to="/teams/1">
+                  <Link to="/teams/1/manage">
                     <Button className="bg-tournament-blue hover:bg-blue-600">
                       Gérer l'équipe
                     </Button>
