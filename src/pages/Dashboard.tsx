@@ -1,15 +1,13 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Users, Calendar, Clock, ChevronRight, ArrowUpRight, X, Check, Crown } from 'lucide-react';
+import { Trophy, Users, Calendar, Clock, ChevronRight, ArrowUpRight, Crown } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import Layout from '@/components/Layout';
 
-// Données fictives pour le tableau de bord
 const upcomingMatches = [
   {
     id: 1,
@@ -75,23 +73,6 @@ const myTournaments = [
   }
 ];
 
-const pendingInvitations = [
-  {
-    id: 1,
-    teamName: "Les Invincibles",
-    leader: "Martin Dupont",
-    leaderAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
-    date: "12 Nov 2023"
-  },
-  {
-    id: 2,
-    teamName: "Team Omega",
-    leader: "Marie Dubois",
-    leaderAvatar: "https://randomuser.me/api/portraits/women/3.jpg",
-    date: "8 Nov 2023"
-  }
-];
-
 const Dashboard = () => {
   return (
     <Layout>
@@ -108,12 +89,10 @@ const Dashboard = () => {
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="tournaments">Mes tournois</TabsTrigger>
             <TabsTrigger value="teams">Mes équipes</TabsTrigger>
-            <TabsTrigger value="invitations">Invitations</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Prochains matchs */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">Prochains matchs</CardTitle>
@@ -155,7 +134,6 @@ const Dashboard = () => {
                 </CardFooter>
               </Card>
 
-              {/* Résultats récents */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">Résultats récents</CardTitle>
@@ -196,7 +174,6 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            {/* Statistiques rapides */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <Card>
                 <CardContent className="pt-6">
@@ -409,57 +386,6 @@ const Dashboard = () => {
                 </CardFooter>
               </Card>
             </div>
-          </TabsContent>
-
-          <TabsContent value="invitations" className="space-y-6">
-            <h2 className="text-xl font-semibold mb-4">Invitations en attente</h2>
-            
-            {pendingInvitations.length > 0 ? (
-              <div className="space-y-4">
-                {pendingInvitations.map((invitation) => (
-                  <Card key={invitation.id}>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <Avatar className="h-12 w-12 mr-4">
-                            <AvatarImage src="https://source.unsplash.com/random/100x100/?team" />
-                            <AvatarFallback>{invitation.teamName.substring(0, 2).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">{invitation.teamName}</div>
-                            <div className="flex items-center text-sm text-gray-500 mt-1">
-                              <Avatar className="h-4 w-4 mr-1">
-                                <AvatarImage src={invitation.leaderAvatar} />
-                                <AvatarFallback>?</AvatarFallback>
-                              </Avatar>
-                              Invitation de {invitation.leader}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <Button variant="outline" size="sm" className="mr-2 text-red-600 border-red-200 hover:bg-red-50">
-                            <X className="mr-1 h-4 w-4" />
-                            Refuser
-                          </Button>
-                          <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                            <Check className="mr-1 h-4 w-4" />
-                            Accepter
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Users className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-lg font-medium text-gray-900">Aucune invitation</h3>
-                  <p className="mt-1 text-gray-500">Vous n'avez pas d'invitations en attente.</p>
-                </CardContent>
-              </Card>
-            )}
           </TabsContent>
         </Tabs>
       </div>
