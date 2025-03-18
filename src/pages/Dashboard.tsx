@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -274,7 +273,7 @@ const Dashboard = () => {
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                      <Link to={`/tournaments/${tournament.id}`}>
+                      <Link to={`/tournaments/${tournament.id}/manage`}>
                         <Button variant="outline">Gérer</Button>
                       </Link>
                       <Link to={`/tournaments/${tournament.id}/bracket`}>

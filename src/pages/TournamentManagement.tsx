@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -12,13 +11,12 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Trophy, Users, Settings, Calendar, Mail, Link as LinkIcon, CheckCircle, XCircle, UserPlus, UserMinus, Calendar as CalendarIcon, Gift, Shield } from 'lucide-react';
+import { Trophy, Users, Settings, Calendar, Mail, Link as LinkIcon, CheckCircle, XCircle, UserPlus, UserMinus, Calendar as CalendarIcon, Gift, Shield, MessageSquare, CheckSquare } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
-// Mocked tournament data
 const tournamentData = {
   id: 5,
   title: "Tournoi International de Basketball",
@@ -35,13 +33,11 @@ const tournamentData = {
   imageSrc: "https://source.unsplash.com/random/300x200/?basketball"
 };
 
-// Mocked administrators data
 const initialAdmins = [
   { id: 1, name: "Jean Dupont", email: "jean@example.com", role: "Organisateur" },
   { id: 2, name: "Marie Martin", email: "marie@example.com", role: "Administrateur" }
 ];
 
-// Mocked teams data
 const initialTeams = [
   { id: 1, name: "Les Dragons", status: "Confirmé", members: 5 },
   { id: 2, name: "Eagles", status: "En attente", members: 4 },
@@ -49,10 +45,64 @@ const initialTeams = [
   { id: 4, name: "Titans", status: "Refusé", members: 3 }
 ];
 
-// Mocked matches data
 const initialMatches = [
-  { id: 1, team1: "Les Dragons", team2: "Eagles", date: "5 Déc 2023", status: "À jouer", score1: null, score2: null },
-  { id: 2, name: "Warriors", team2: "Titans", date: "7 Déc 2023", status: "À jouer", score1: null, score2: null }
+  { 
+    id: 1, 
+    team1: "Les Dragons", 
+    team2: "Eagles", 
+    date: "5 Déc 2023", 
+    status: "À valider", 
+    score1: null, 
+    score2: null,
+    team1Submission: {
+      score1: 3,
+      score2: 1,
+      submittedBy: "Jean Dupont",
+      submittedAt: "5 Déc 2023 18:30",
+      comment: "Match terminé sans incidents."
+    },
+    team2Submission: {
+      score1: 3,
+      score2: 1,
+      submittedBy: "Marie Martin",
+      submittedAt: "5 Déc 2023 18:35",
+      comment: "Confirmé."
+    }
+  },
+  { 
+    id: 2, 
+    team1: "Warriors", 
+    team2: "Titans", 
+    date: "7 Déc 2023", 
+    status: "À valider", 
+    score1: null, 
+    score2: null,
+    team1Submission: {
+      score1: 2,
+      score2: 0,
+      submittedBy: "Thomas Bernard",
+      submittedAt: "7 Déc 2023 19:45",
+      comment: "Victoire nette de Warriors."
+    },
+    team2Submission: {
+      score1: 1,
+      score2: 0,
+      submittedBy: "Sophie Klein",
+      submittedAt: "7 Déc 2023 19:50",
+      comment: "Contestation sur le 2ème but."
+    }
+  },
+  { 
+    id: 3, 
+    team1: "Phoenix", 
+    team2: "Cobras", 
+    date: "10 Déc 2023", 
+    status: "À jouer", 
+    score1: null, 
+    score2: null,
+    team1Submission: null,
+    team2Submission: null
+  }
 ];
 
 const TournamentManagement = () => {
@@ -68,8 +118,8 @@ const TournamentManagement = () => {
   const [newAdmin, setNewAdmin] = useState({ email: '', role: 'Administrateur' });
   const [inviteLink, setInviteLink] = useState(`https://tournoi.app/invite/${id}`);
   const [isEditingSettings, setIsEditingSettings] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState(null);
 
-  // Handle tournament settings update
   const handleSettingsUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
@@ -79,7 +129,6 @@ const TournamentManagement = () => {
     setIsEditingSettings(false);
   };
 
-  // Handle add administrator
   const handleAddAdmin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAdmin.email) return;
@@ -100,7 +149,6 @@ const TournamentManagement = () => {
     });
   };
 
-  // Handle remove administrator
   const handleRemoveAdmin = (adminId: number) => {
     setAdmins(admins.filter(admin => admin.id !== adminId));
     toast({
@@ -109,7 +157,6 @@ const TournamentManagement = () => {
     });
   };
 
-  // Handle team status update
   const handleTeamStatusUpdate = (teamId: number, newStatus: string) => {
     setTeams(teams.map(team => 
       team.id === teamId ? { ...team, status: newStatus } : team
@@ -121,7 +168,6 @@ const TournamentManagement = () => {
     });
   };
 
-  // Copy invite link
   const copyInviteLink = () => {
     navigator.clipboard.writeText(inviteLink);
     toast({
@@ -130,7 +176,6 @@ const TournamentManagement = () => {
     });
   };
 
-  // Send invitation email
   const sendInvitationEmail = (email: string) => {
     toast({
       title: "Invitation envoyée",
@@ -138,10 +183,32 @@ const TournamentManagement = () => {
     });
   };
 
+  const handleValidateResult = (matchId: number, scoreTeam1: number, scoreTeam2: number) => {
+    setMatches(matches.map(match => 
+      match.id === matchId ? { 
+        ...match, 
+        score1: scoreTeam1, 
+        score2: scoreTeam2, 
+        status: "Terminé" 
+      } : match
+    ));
+    
+    toast({
+      title: "Résultat validé",
+      description: `Le résultat du match a été validé et enregistré.`,
+    });
+  };
+
+  const handleRequestResult = (matchId: number) => {
+    toast({
+      title: "Demande envoyée",
+      description: "Un email a été envoyé aux capitaines des deux équipes pour saisir le résultat.",
+    });
+  };
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Tournament Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center space-x-4">
@@ -166,7 +233,6 @@ const TournamentManagement = () => {
           </div>
         </div>
 
-        {/* Management Tabs */}
         <Tabs defaultValue="settings">
           <TabsList className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-2">
             <TabsTrigger value="settings">
@@ -187,7 +253,6 @@ const TournamentManagement = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Settings Tab */}
           <TabsContent value="settings">
             <Card>
               <CardHeader>
@@ -348,7 +413,6 @@ const TournamentManagement = () => {
             </Card>
           </TabsContent>
 
-          {/* Teams Tab */}
           <TabsContent value="teams">
             <Card>
               <CardHeader>
@@ -512,106 +576,233 @@ const TournamentManagement = () => {
             </Card>
           </TabsContent>
 
-          {/* Matches Tab */}
           <TabsContent value="matches">
             <Card>
               <CardHeader>
                 <CardTitle>Matchs</CardTitle>
                 <CardDescription>
-                  Gérez les matchs de votre tournoi et validez les résultats
+                  Gérez les matchs de votre tournoi et validez les résultats soumis par les équipes
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {matches.map(match => (
-                    <div key={match.id} className="flex flex-col md:flex-row justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
-                      <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{match.team1}</span>
-                          <span className="mx-2 text-lg font-bold">
-                            {match.score1 !== null ? match.score1 : '-'}
-                          </span>
-                        </div>
-                        <span className="hidden md:block">vs</span>
-                        <div className="flex items-center justify-between mt-2 md:mt-0">
-                          <span className="font-medium">{match.team2}</span>
-                          <span className="mx-2 text-lg font-bold">
-                            {match.score2 !== null ? match.score2 : '-'}
-                          </span>
-                        </div>
-                        <Badge
-                          className={
-                            match.status === 'Terminé' ? 'bg-green-100 text-green-800 hover:bg-green-100 ml-4' :
-                            match.status === 'En cours' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100 ml-4' :
-                            'bg-yellow-100 text-yellow-800 hover:bg-yellow-100 ml-4'
-                          }
-                        >
-                          {match.status}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between md:justify-end space-x-2 mt-4 md:mt-0">
-                        <div className="text-sm text-muted-foreground flex items-center">
-                          <CalendarIcon className="mr-1 h-4 w-4" />
-                          {match.date}
-                        </div>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              Résultat
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Saisir le résultat du match</DialogTitle>
-                              <DialogDescription>
-                                {match.team1} vs {match.team2} - {match.date}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid grid-cols-5 items-center gap-4 py-4">
-                              <div className="col-span-2">
-                                <Label htmlFor="score1" className="text-center block">
-                                  {match.team1}
-                                </Label>
-                                <Input
-                                  id="score1"
-                                  type="number"
-                                  min="0"
-                                  className="text-center"
-                                  placeholder="0"
-                                />
+                    <Card key={match.id} className="border-2 hover:border-tournament-blue/30 transition-colors">
+                      <CardHeader className="pb-2">
+                        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                          <div>
+                            <CardTitle className="text-lg flex items-center">
+                              <Trophy className="mr-2 h-5 w-5 text-tournament-blue" />
+                              Match #{match.id}
+                            </CardTitle>
+                            <CardDescription>
+                              <div className="flex items-center mt-1">
+                                <CalendarIcon className="mr-1 h-4 w-4" />
+                                {match.date}
                               </div>
-                              <div className="flex justify-center">
-                                <span className="text-xl font-bold">-</span>
+                            </CardDescription>
+                          </div>
+                          <Badge
+                            className={
+                              match.status === 'Terminé' ? 'bg-green-100 text-green-800 hover:bg-green-100' :
+                              match.status === 'En cours' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
+                              match.status === 'À valider' ? 'bg-orange-100 text-orange-800 hover:bg-orange-100' :
+                              'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
+                            }
+                          >
+                            {match.status}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="text-center py-4 px-6 rounded-lg bg-gray-50">
+                            <Avatar className="h-12 w-12 mx-auto mb-2">
+                              <AvatarImage src={`https://ui-avatars.com/api/?name=${match.team1}&background=random`} />
+                              <AvatarFallback>{match.team1.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="font-medium text-lg">{match.team1}</div>
+                            
+                            {match.team1Submission ? (
+                              <div className="mt-4">
+                                <div className="text-2xl font-bold">
+                                  {match.team1Submission.score1} - {match.team1Submission.score2}
+                                </div>
+                                <div className="mt-2 p-3 bg-white rounded-md text-left">
+                                  <div className="text-sm font-medium flex items-center">
+                                    <MessageSquare className="mr-1 h-4 w-4 text-gray-400" />
+                                    Commentaire:
+                                  </div>
+                                  <p className="text-sm mt-1">{match.team1Submission.comment}</p>
+                                  <div className="text-xs text-gray-500 mt-2">
+                                    Soumis par {match.team1Submission.submittedBy} · {match.team1Submission.submittedAt}
+                                  </div>
+                                </div>
                               </div>
-                              <div className="col-span-2">
-                                <Label htmlFor="score2" className="text-center block">
-                                  {match.team2}
-                                </Label>
-                                <Input
-                                  id="score2"
-                                  type="number"
-                                  min="0"
-                                  className="text-center"
-                                  placeholder="0"
-                                />
+                            ) : (
+                              <div className="mt-4 text-sm text-gray-500">
+                                Aucun résultat soumis
                               </div>
-                            </div>
-                            <DialogFooter>
-                              <Button
-                                onClick={() => {
-                                  toast({
-                                    title: "Résultat enregistré",
-                                    description: `Le résultat du match a été enregistré.`,
-                                  });
-                                }}
-                              >
-                                Valider
+                            )}
+                          </div>
+                          
+                          <div className="text-center py-4 px-6 rounded-lg bg-gray-50">
+                            <Avatar className="h-12 w-12 mx-auto mb-2">
+                              <AvatarImage src={`https://ui-avatars.com/api/?name=${match.team2}&background=random`} />
+                              <AvatarFallback>{match.team2.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="font-medium text-lg">{match.team2}</div>
+                            
+                            {match.team2Submission ? (
+                              <div className="mt-4">
+                                <div className="text-2xl font-bold">
+                                  {match.team2Submission.score1} - {match.team2Submission.score2}
+                                </div>
+                                <div className="mt-2 p-3 bg-white rounded-md text-left">
+                                  <div className="text-sm font-medium flex items-center">
+                                    <MessageSquare className="mr-1 h-4 w-4 text-gray-400" />
+                                    Commentaire:
+                                  </div>
+                                  <p className="text-sm mt-1">{match.team2Submission.comment}</p>
+                                  <div className="text-xs text-gray-500 mt-2">
+                                    Soumis par {match.team2Submission.submittedBy} · {match.team2Submission.submittedAt}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="mt-4 text-sm text-gray-500">
+                                Aucun résultat soumis
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="justify-end gap-2 pt-0">
+                        {match.status === 'À jouer' && (
+                          <Button variant="outline" size="sm" onClick={() => handleRequestResult(match.id)}>
+                            <Mail className="mr-1 h-4 w-4" />
+                            Demander résultat
+                          </Button>
+                        )}
+                        
+                        {match.status === 'À valider' && match.team1Submission && match.team2Submission && (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button className="bg-tournament-blue hover:bg-blue-600">
+                                <CheckSquare className="mr-1 h-4 w-4" />
+                                Valider le résultat
                               </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </div>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                              <DialogHeader>
+                                <DialogTitle>Valider le résultat du match</DialogTitle>
+                                <DialogDescription>
+                                  {match.team1} vs {match.team2} - {match.date}
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="py-4">
+                                <div className="text-center mb-4">
+                                  <h3 className="font-medium">Propositions des équipes</h3>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                  <div className="bg-gray-50 p-3 rounded-md">
+                                    <div className="text-sm font-medium">{match.team1}</div>
+                                    <div className="text-xl font-bold mt-1">
+                                      {match.team1Submission?.score1} - {match.team1Submission?.score2}
+                                    </div>
+                                  </div>
+                                  <div className="bg-gray-50 p-3 rounded-md">
+                                    <div className="text-sm font-medium">{match.team2}</div>
+                                    <div className="text-xl font-bold mt-1">
+                                      {match.team2Submission?.score1} - {match.team2Submission?.score2}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {match.team1Submission?.score1 !== match.team2Submission?.score1 || 
+                                match.team1Submission?.score2 !== match.team2Submission?.score2 ? (
+                                  <div className="mb-4 p-3 bg-yellow-50 rounded-md text-yellow-800 text-sm">
+                                    <div className="font-medium">Attention</div>
+                                    <p>Les résultats soumis par les équipes ne correspondent pas. Veuillez vérifier et saisir le résultat final correct.</p>
+                                  </div>
+                                ) : (
+                                  <div className="mb-4 p-3 bg-green-50 rounded-md text-green-800 text-sm">
+                                    <div className="font-medium">Résultats concordants</div>
+                                    <p>Les deux équipes ont soumis le même résultat.</p>
+                                  </div>
+                                )}
+                                
+                                <div className="grid grid-cols-5 items-center gap-4 py-4 border-t pt-4">
+                                  <div className="col-span-2">
+                                    <Label htmlFor={`score1-${match.id}`} className="text-center block">
+                                      {match.team1}
+                                    </Label>
+                                    <Input
+                                      id={`score1-${match.id}`}
+                                      type="number"
+                                      min="0"
+                                      className="text-center"
+                                      placeholder="0"
+                                      defaultValue={match.team1Submission?.score1}
+                                    />
+                                  </div>
+                                  <div className="flex justify-center">
+                                    <span className="text-xl font-bold">-</span>
+                                  </div>
+                                  <div className="col-span-2">
+                                    <Label htmlFor={`score2-${match.id}`} className="text-center block">
+                                      {match.team2}
+                                    </Label>
+                                    <Input
+                                      id={`score2-${match.id}`}
+                                      type="number"
+                                      min="0"
+                                      className="text-center"
+                                      placeholder="0"
+                                      defaultValue={match.team1Submission?.score2}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <DialogFooter className="sm:justify-end">
+                                <Button 
+                                  variant="outline" 
+                                  onClick={() => {}}
+                                >
+                                  Annuler
+                                </Button>
+                                <Button
+                                  onClick={() => {
+                                    const score1 = parseInt(
+                                      (document.getElementById(`score1-${match.id}`) as HTMLInputElement).value
+                                    );
+                                    const score2 = parseInt(
+                                      (document.getElementById(`score2-${match.id}`) as HTMLInputElement).value
+                                    );
+                                    
+                                    handleValidateResult(match.id, score1, score2);
+                                  }}
+                                >
+                                  Valider et enregistrer
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        )}
+                        
+                        {match.status === 'Terminé' && (
+                          <div className="flex items-center space-x-2">
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                              <CheckCircle className="mr-1 h-4 w-4" />
+                              Résultat final: {match.score1} - {match.score2}
+                            </Badge>
+                            <Button variant="outline" size="sm">
+                              Modifier
+                            </Button>
+                          </div>
+                        )}
+                      </CardFooter>
+                    </Card>
                   ))}
                   
                   {matches.length === 0 && (
@@ -628,7 +819,6 @@ const TournamentManagement = () => {
             </Card>
           </TabsContent>
 
-          {/* Administrators Tab */}
           <TabsContent value="admins">
             <Card>
               <CardHeader>
