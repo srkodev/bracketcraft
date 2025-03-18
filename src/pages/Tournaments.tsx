@@ -3,11 +3,33 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, Search, Calendar, Users, Filter, Plus } from 'lucide-react';
 import Layout from '@/components/Layout';
 
-// Données de tournois fictives
+// Tournament status types
+type TournamentStatus = 'En cours' | 'À venir' | 'Terminé';
+type TournamentType = 'Élimination Simple' | 'Élimination Double';
+
+// Extended tournament type
+interface Tournament {
+  id: number;
+  title: string;
+  organizer: string;
+  date: string;
+  teams: number;
+  type: TournamentType;
+  status: TournamentStatus;
+  imageSrc: string;
+}
+
 const TOURNAMENTS = [
   {
     id: 1,
@@ -73,21 +95,30 @@ const TOURNAMENTS = [
 
 const Tournaments = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [tournaments, setTournaments] = useState(TOURNAMENTS);
+  const [statusFilter, setStatusFilter] = useState<TournamentStatus | 'all'>('all');
+  const [typeFilter, setTypeFilter] = useState<TournamentType | 'all'>('all');
+  const [tournaments, setTournaments] = useState<Tournament[]>(TOURNAMENTS);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Filtrer les tournois en fonction du terme de recherche
-    const filtered = TOURNAMENTS.filter(tournament => 
-      tournament.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tournament.organizer.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const handleFilters = () => {
+    let filtered = TOURNAMENTS.filter(tournament => {
+      const matchesSearch = tournament.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          tournament.organizer.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || tournament.status === statusFilter;
+      const matchesType = typeFilter === 'all' || tournament.type === typeFilter;
+      
+      return matchesSearch && matchesStatus && matchesType;
+    });
     setTournaments(filtered);
   };
+
+  React.useEffect(() => {
+    handleFilters();
+  }, [searchTerm, statusFilter, typeFilter]);
 
   return (
     <Layout>
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Tournois</h1>
@@ -105,8 +136,9 @@ const Tournaments = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
-          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+        {/* Filters Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-grow">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
@@ -117,62 +149,98 @@ const Tournaments = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" type="button" className="flex items-center">
-                <Filter className="mr-2 h-4 w-4" />
-                Filtres
-              </Button>
-              <Button type="submit" className="bg-tournament-blue hover:bg-blue-600">
-                Rechercher
-              </Button>
+            <div className="flex flex-col md:flex-row gap-4">
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => setStatusFilter(value as TournamentStatus | 'all')}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="En cours">En cours</SelectItem>
+                  <SelectItem value="À venir">À venir</SelectItem>
+                  <SelectItem value="Terminé">Terminé</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={typeFilter}
+                onValueChange={(value) => setTypeFilter(value as TournamentType | 'all')}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les types</SelectItem>
+                  <SelectItem value="Élimination Simple">Élimination Simple</SelectItem>
+                  <SelectItem value="Élimination Double">Élimination Double</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </form>
+          </div>
         </div>
 
+        {/* Tournament Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tournaments.map((tournament) => (
             <Link to={`/tournaments/${tournament.id}`} key={tournament.id}>
-              <Card className="h-full hover:shadow-md transition-shadow duration-300 overflow-hidden">
-                <div className="h-48 overflow-hidden">
+              <Card className="h-full hover:shadow-lg transition-all duration-300 overflow-hidden group">
+                <div className="h-48 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
                   <img 
                     src={tournament.imageSrc} 
                     alt={tournament.title} 
-                    className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                   />
-                </div>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg">{tournament.title}</CardTitle>
-                    <div className={`
-                      px-2 py-1 text-xs font-medium rounded-full
-                      ${tournament.status === 'En cours' ? 'bg-green-100 text-green-800' : 
-                        tournament.status === 'À venir' ? 'bg-blue-100 text-blue-800' : 
-                        'bg-gray-100 text-gray-800'}
-                    `}>
-                      {tournament.status}
-                    </div>
+                  <div className={`
+                    absolute top-4 right-4 z-20 px-3 py-1 text-sm font-medium rounded-full
+                    ${tournament.status === 'En cours' ? 'bg-green-500 text-white' : 
+                      tournament.status === 'À venir' ? 'bg-blue-500 text-white' : 
+                      'bg-gray-500 text-white'}
+                  `}>
+                    {tournament.status}
                   </div>
-                  <p className="text-sm text-gray-500">{tournament.organizer}</p>
+                </div>
+                <CardHeader className="relative z-20 -mt-6">
+                  <div className="bg-white rounded-lg p-4 shadow-md">
+                    <CardTitle className="text-xl mb-2">{tournament.title}</CardTitle>
+                    <p className="text-sm text-gray-500">{tournament.organizer}</p>
+                  </div>
                 </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="flex flex-col space-y-3">
-                    <div className="flex items-center text-sm">
-                      <Calendar className="mr-2 h-4 w-4 text-gray-400" />
+                <CardContent className="pt-2">
+                  <div className="space-y-3">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Calendar className="mr-2 h-4 w-4 text-tournament-blue" />
                       <span>{tournament.date}</span>
                     </div>
-                    <div className="flex items-center text-sm">
-                      <Users className="mr-2 h-4 w-4 text-gray-400" />
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Users className="mr-2 h-4 w-4 text-tournament-blue" />
                       <span>{tournament.teams} équipes</span>
                     </div>
-                    <div className="flex items-center text-sm">
-                      <Trophy className="mr-2 h-4 w-4 text-gray-400" />
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Trophy className="mr-2 h-4 w-4 text-tournament-blue" />
                       <span>{tournament.type}</span>
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button variant="ghost" className="w-full text-tournament-blue hover:bg-blue-50">
+                  <Button variant="ghost" className="w-full text-tournament-blue hover:bg-blue-50 group-hover:bg-blue-50">
                     Voir les détails
+                    <svg
+                      className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
                   </Button>
                 </CardFooter>
               </Card>
