@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Tournaments from "./pages/Tournaments";
 import Teams from "./pages/Teams";
+import TeamDetail from "./pages/TeamDetail";
 import Dashboard from "./pages/Dashboard";
 import TournamentBracket from "./pages/TournamentBracket";
 import CreateTournament from "./pages/CreateTournament";
@@ -33,6 +34,7 @@ const App = () => (
           {/* Teams routes are still available but only accessible through tournament links */}
           <Route path="/teams" element={<Teams />} />
           <Route path="/teams/create" element={<CreateTeam />} />
+          <Route path="/teams/:id" element={<TeamDetail />} />
           <Route path="/dashboard" element={<Dashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
