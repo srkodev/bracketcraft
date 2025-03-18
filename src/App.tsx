@@ -30,6 +30,7 @@ const App = () => (
           <Route path="/tournaments" element={<Tournaments />} />
           <Route path="/tournaments/create" element={<CreateTournament />} />
           <Route path="/tournaments/:id/bracket" element={<TournamentBracket />} />
+          {/* Teams routes are still available but only accessible through tournament links */}
           <Route path="/teams" element={<Teams />} />
           <Route path="/teams/create" element={<CreateTeam />} />
           <Route path="/dashboard" element={<Dashboard />} />

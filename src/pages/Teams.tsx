@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Search, UserPlus, Crown, Share2, Trophy, AlertCircle } from 'lucide-react';
+import { Users, Search, UserPlus, Crown, Share2, Trophy, AlertCircle, ArrowLeft } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Layout from '@/components/Layout';
@@ -94,24 +94,31 @@ interface Team {
 }
 
 const Teams = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const tournamentId = searchParams.get('tournamentId') ? Number(searchParams.get('tournamentId')) : null;
   const [searchTerm, setSearchTerm] = useState('');
   const [teams, setTeams] = useState<Team[]>([]);
   const [currentTournament, setCurrentTournament] = useState<{id: number, name: string} | null>(null);
 
   useEffect(() => {
+    // Redirect if no tournamentId is provided
+    if (!tournamentId) {
+      navigate('/tournaments');
+      return;
+    }
+
     // Filtrer les équipes par tournoi et terme de recherche
     let filteredTeams = TEAMS_DATA;
     
-    if (tournamentId) {
-      filteredTeams = filteredTeams.filter(team => team.tournamentId === tournamentId);
-      const tournament = TOURNAMENTS.find(t => t.id === tournamentId);
-      if (tournament) {
-        setCurrentTournament(tournament);
-      }
+    filteredTeams = filteredTeams.filter(team => team.tournamentId === tournamentId);
+    const tournament = TOURNAMENTS.find(t => t.id === tournamentId);
+    if (tournament) {
+      setCurrentTournament(tournament);
     } else {
-      setCurrentTournament(null);
+      // Redirect if tournament doesn't exist
+      navigate('/tournaments');
+      return;
     }
     
     if (searchTerm) {
@@ -122,52 +129,50 @@ const Teams = () => {
     }
     
     setTeams(filteredTeams);
-  }, [tournamentId, searchTerm]);
+  }, [tournamentId, searchTerm, navigate]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Le filtrage est déjà géré par useEffect
   };
 
+  // If no tournamentId is provided, this will redirect automatically
+  if (!tournamentId || !currentTournament) {
+    return null;
+  }
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="flex items-center text-gray-500" 
+                onClick={() => navigate('/tournaments')}
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Tournois
+              </Button>
+            </div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {currentTournament ? `Équipes - ${currentTournament.name}` : 'Toutes les équipes'}
+              Équipes - {currentTournament.name}
             </h1>
             <p className="mt-2 text-gray-600">
-              {currentTournament 
-                ? `Découvrez les équipes participant à ce tournoi` 
-                : `Découvrez les équipes participant aux différents tournois.`}
+              Découvrez les équipes participant à ce tournoi
             </p>
           </div>
-          {currentTournament && (
-            <div className="mt-4 md:mt-0">
-              <Link to={`/teams/create?tournamentId=${currentTournament.id}`}>
-                <Button className="bg-tournament-blue hover:bg-blue-600">
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Inscrire une équipe
-                </Button>
-              </Link>
-            </div>
-          )}
+          <div className="mt-4 md:mt-0">
+            <Link to={`/teams/create?tournamentId=${currentTournament.id}`}>
+              <Button className="bg-tournament-blue hover:bg-blue-600">
+                <UserPlus className="mr-2 h-4 w-4" />
+                Inscrire une équipe
+              </Button>
+            </Link>
+          </div>
         </div>
-
-        {!currentTournament && (
-          <Alert className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Veuillez sélectionner un tournoi pour voir les équipes participantes.
-              <div className="mt-2">
-                <Link to="/tournaments" className="text-tournament-blue hover:underline">
-                  Aller à la page des tournois
-                </Link>
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
 
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
           <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">

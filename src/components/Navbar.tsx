@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Trophy, Menu, X, Users, Home, Calendar } from 'lucide-react';
+import { Trophy, Menu, X, Home, Calendar } from 'lucide-react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,9 +29,6 @@ const Navbar = () => {
               </Link>
               <Link to="/tournaments" className="text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-sm font-medium">
                 Tournois
-              </Link>
-              <Link to="/teams" className="text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-sm font-medium">
-                Équipes
               </Link>
               <Link to="/dashboard" className="text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-sm font-medium">
                 Tableau de bord
@@ -76,10 +73,6 @@ const Navbar = () => {
             <Link to="/tournaments" className="flex items-center text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-base font-medium">
               <Trophy className="mr-2 h-5 w-5" />
               Tournois
-            </Link>
-            <Link to="/teams" className="flex items-center text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-base font-medium">
-              <Users className="mr-2 h-5 w-5" />
-              Équipes
             </Link>
             <Link to="/dashboard" className="flex items-center text-gray-700 hover:text-tournament-blue px-3 py-2 rounded-md text-base font-medium">
               <Calendar className="mr-2 h-5 w-5" />
